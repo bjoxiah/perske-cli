@@ -1,2 +1,26 @@
-# mango-cli
-A JAMSTACK deployment helper for AWS
+# mango CLI
+
+A CLI for mango.
+
+## Customizing your CLI
+
+Check out the documentation at https://github.com/infinitered/gluegun/tree/master/docs.
+
+## Publishing to NPM
+
+To package your CLI up for NPM, do this:
+
+```shell
+$ npm login
+$ npm whoami
+$ npm test
+
+$ npm run build
+
+$ npm publish
+```
+
+# License
+
+MIT - see LICENSE
+
