@@ -27,3 +27,12 @@ export const upsertGitIgnore = async (): Promise<void> => {
     print.fancy('Create .gitignore file and added .mango!!')
   }
 }
+
+export const getOS = (): string => {
+  switch (process.platform) {
+    case 'win32':
+      return 'windows'
+    default:
+      return 'linux'
+  }
+}

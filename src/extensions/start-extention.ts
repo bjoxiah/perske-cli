@@ -3,6 +3,7 @@ import { fileExist, upsertGitIgnore } from '../helper'
 
 const DIRNAME = filesystem.cwd()
 const CONFIG_FILE_PATH = `${DIRNAME}/.mango/config.json`
+const MANGO_FILE_PATH = `${DIRNAME}/.mango`
 
 module.exports = async (toolbox: GluegunToolbox) => {
   toolbox.start = async () => {
@@ -10,6 +11,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
       prompt: { ask },
       print,
       filesystem,
+      build,
+      copy,
     } = toolbox
     print.info("Let's begin!")
 
@@ -28,12 +31,14 @@ module.exports = async (toolbox: GluegunToolbox) => {
       ])
 
       if (action.restart) {
-        await filesystem.removeAsync(CONFIG_FILE_PATH)
+        await filesystem.removeAsync(MANGO_FILE_PATH)
         print.info('Re-running the command with new configuration...')
         await toolbox.start() // Recursive call
       } else {
         // start building the app
+        await build()
         // copy build file
+        await copy()
         // transfer to s3 bucket
         // configure domain
         print.fancy('Deployment successful!')
@@ -55,6 +60,13 @@ module.exports = async (toolbox: GluegunToolbox) => {
           type: 'invisible',
           name: 'awsAccessSecret',
           message: 'AWS Access Secret:',
+        },
+        {
+          type: 'input',
+          name: 'buildFolder',
+          message:
+            "Is your build folder 'dist'? If not, please specify it here.",
+          initial: 'dist',
         },
         {
           type: 'confirm',
@@ -85,8 +97,12 @@ module.exports = async (toolbox: GluegunToolbox) => {
 
       print.info(data)
 
+      // create deployment folder
+      await filesystem.dirAsync(`${DIRNAME}/.mango/${result.buildFolder}`)
+
       // run the deployment flow
-      print.fancy('Deployment successful!')
+      await build()
+      await copy()
     }
   }
 }
