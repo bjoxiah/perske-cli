@@ -36,3 +36,20 @@ export const getOS = (): string => {
       return 'linux'
   }
 }
+
+export const getConfigJSON = async (): Promise<any> => {
+  const __dirname = filesystem.cwd()
+  const CONFIG_FILE_PATH = `${__dirname}/.mango/config.json`
+  const config = await filesystem.readAsync(CONFIG_FILE_PATH)
+  return JSON.parse(config)
+}
+
+export const getCopyCommand = async (
+  homeDir: string,
+  config: any
+): Promise<string> => {
+  if (getOS() != 'windows') {
+    return `cp -R ./${config.buildFolder} ${homeDir}/.mango/${config.buildFolder}`
+  }
+  return `xcopy .\\${config.buildFolder} ${homeDir}\\.mango\\${config.buildFolder} /E /I`
+}
