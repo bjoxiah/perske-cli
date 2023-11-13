@@ -1,7 +1,7 @@
 
 # Perske CLI
 
-Perske CLI streamlines the deployment process for JavaScript applications, including React, Angular, Svelte, and more. It simplifies the hosting of static sites on AWS, handling everything from file uploads to domain configuration.
+Perske CLI streamlines the deployment process for JavaScript applications, including React, Angular, Svelte, and more. It simplifies the deployment of static sites on AWS, handling everything from file uploads to domain configuration.
 
 ## Installation
 
