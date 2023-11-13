@@ -1,23 +1,20 @@
 import { GluegunToolbox } from 'gluegun'
 import { getCopyCommand } from '../helper'
+import { IConfig } from '../model'
 
 module.exports = async (toolbox: GluegunToolbox) => {
-  toolbox.copy = async (homeDir: string, config: any) => {
+  toolbox.copy = async (homeDir: string, config: IConfig) => {
     const { print, system } = toolbox
-    const spinner = print.spin('Copy project files to .mango!')
+    const spinner = print.spin('Copy project files to .perske!')
 
     const copyCommand = await getCopyCommand(homeDir, config)
 
-    const copy = await system.run(
-      `cd .. && cd mango-test-app && ${copyCommand}`
-    )
-    // await filesystem.copyAsync()
+    const copy = await system.run(`${copyCommand}`)
 
     spinner.stop()
 
     print.info(copy)
 
-    // copy files to .mango
     print.info('Ready to deploy!!!')
   }
 }

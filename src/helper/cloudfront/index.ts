@@ -18,17 +18,17 @@ const cloudfront = new CloudFrontClient({
 })
 
 export const createCloudFrontDistribution = async (
-  s3BucketName: string,
+  bucketName: string,
   certificateArn: string = null,
   domainName: string = null
 ): Promise<string> => {
   try {
-    const domain = `${s3BucketName}.s3-website.${process.env.REGION}.amazonaws.com`
+    const domain = `${bucketName}.s3-website.${process.env.REGION}.amazonaws.com`
     print.info(`possible domain ${domain}`)
     const params: CreateDistributionCommandInput = {
       DistributionConfig: {
-        CallerReference: `${s3BucketName}-${Date.now().toString()}`,
-        Comment: `Cloud front distribution for ${s3BucketName} bucket`,
+        CallerReference: `${bucketName}-${Date.now().toString()}`,
+        Comment: `Cloud front distribution for ${bucketName} bucket`,
         DefaultCacheBehavior: {
           ViewerProtocolPolicy: 'redirect-to-https',
           TargetOriginId: 'Custom-Origin',

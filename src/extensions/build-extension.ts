@@ -4,9 +4,7 @@ module.exports = async (toolbox: GluegunToolbox) => {
     const { print, system } = toolbox
     const spinner = print.spin('Building project files!')
     // Build the project
-    const build = await system.run(
-      `cd .. && cd mango-test-app && npm run build`
-    )
+    const build = await system.run(`npm install --f && npm run build`)
     spinner.stop()
 
     print.highlight(build)

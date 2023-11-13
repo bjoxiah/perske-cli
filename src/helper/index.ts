@@ -1,4 +1,5 @@
 import { filesystem, print } from 'gluegun'
+import { IConfig } from '../model'
 
 export const fileExist = async (filePath: string): Promise<boolean> => {
   const file = await filesystem.existsAsync(filePath)
@@ -12,19 +13,19 @@ export const upsertGitIgnore = async (): Promise<void> => {
   const gitIgnoreFileExist = await fileExist(__gitIgnoreFilePath)
   if (gitIgnoreFileExist) {
     gitignoreFile = await filesystem.readAsync(__gitIgnoreFilePath)
-    const mangoExist = gitignoreFile.split('\n').includes('.mango')
-    if (mangoExist) {
-      print.fancy('.mango is already in git ignored!')
+    const perskeExist = gitignoreFile.split('\n').includes('.perske')
+    if (perskeExist) {
+      print.fancy('.perske is already in git ignored!')
     } else {
-      gitignoreFile += `\n# Mango Cli\n.mango`
+      gitignoreFile += `\n# Mango Cli\n.perske`
       await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
-      print.fancy('Added .mango to .gitignore!')
+      print.fancy('Added .perske to .gitignore!')
     }
   } else {
     // create a .gitignore file in the root directory
-    gitignoreFile = `\n# Mango Cli\n.mango/`
+    gitignoreFile = `\n# Mango Cli\n.perske/`
     await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
-    print.fancy('Create .gitignore file and added .mango!!')
+    print.fancy('Create .gitignore file and added .perske!!')
   }
 }
 
@@ -37,19 +38,19 @@ export const getOS = (): string => {
   }
 }
 
-export const getConfigJSON = async (): Promise<any> => {
+export const getConfigJSON = async (): Promise<IConfig> => {
   const __dirname = filesystem.cwd()
-  const CONFIG_FILE_PATH = `${__dirname}/.mango/config.json`
+  const CONFIG_FILE_PATH = `${__dirname}/.perske/config.json`
   const config = await filesystem.readAsync(CONFIG_FILE_PATH)
   return JSON.parse(config)
 }
 
 export const getCopyCommand = async (
   homeDir: string,
-  config: any
+  config: IConfig
 ): Promise<string> => {
   if (getOS() != 'windows') {
-    return `cp -R ./${config.buildFolder} ${homeDir}/.mango/${config.buildFolder}`
+    return `cp -R ./${config.buildFolder} ${homeDir}/.perske/${config.buildFolder}`
   }
-  return `xcopy .\\${config.buildFolder} ${homeDir}\\.mango\\${config.buildFolder} /E /I`
+  return `xcopy .\\${config.buildFolder} ${homeDir}\\.perske\\${config.buildFolder} /E /I`
 }

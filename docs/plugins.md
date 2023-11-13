@@ -1,10 +1,10 @@
-# Plugin guide for mango
+# Plugin guide for perske
 
-Plugins allow you to add features to mango, such as commands and
+Plugins allow you to add features to perske, such as commands and
 extensions to the `toolbox` object that provides the majority of the functionality
-used by mango.
+used by perske.
 
-Creating a mango plugin is easy. Just create a repo with two folders:
+Creating a perske plugin is easy. Just create a repo with two folders:
 
 ```
 commands/
@@ -22,7 +22,7 @@ module.exports = {
 
     const desktopDirectories = filesystem.subdirectories(`~/Desktop`)
     print.info(desktopDirectories)
-  }
+  },
 }
 ```
 
@@ -34,7 +34,9 @@ An extension lets you add additional features to the `toolbox`.
 module.exports = (toolbox) => {
   const { print } = toolbox
 
-  toolbox.bar = () => { print.info('Bar!') }
+  toolbox.bar = () => {
+    print.info('Bar!')
+  }
 }
 ```
 
@@ -42,6 +44,6 @@ This is then accessible in your plugin's commands as `toolbox.bar`.
 
 # Loading a plugin
 
-To load a particular plugin (which has to start with `mango-*`),
-install it to your project using `npm install --save-dev mango-PLUGINNAME`,
-and mango will pick it up automatically.
+To load a particular plugin (which has to start with `perske-*`),
+install it to your project using `npm install --save-dev perske-PLUGINNAME`,
+and perske will pick it up automatically.

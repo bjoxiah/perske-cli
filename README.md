@@ -1,6 +1,6 @@
-# mango CLI
+# perske CLI
 
-A CLI for mango.
+A CLI for perske.
 
 ## Customizing your CLI
 
@@ -23,4 +23,3 @@ $ npm publish
 # License
 
 MIT - see LICENSE
-
