@@ -8,7 +8,7 @@ Perske CLI streamlines the deployment process for JavaScript applications, inclu
 Install Perske CLI globally using npm:
 
 ```bash
-npm install -g perske-cli
+npm install -g perske
 ```
 
 ## Prerequisites

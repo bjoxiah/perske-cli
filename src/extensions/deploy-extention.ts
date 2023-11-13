@@ -1,5 +1,6 @@
 import { GluegunToolbox, filesystem } from 'gluegun'
 import { listObjectsInBucket } from '../helper/s3'
+import { upsertGitIgnore } from '../helper'
 
 const DIRNAME = filesystem.cwd()
 const PERSKE_FILE_PATH = `${DIRNAME}/.perske`
@@ -28,6 +29,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
     // List objects in bucket
     const bucketItems = await listObjectsInBucket(json.bucketName)
     if (bucketItems) {
+      // update .gitignore file
+      await upsertGitIgnore()
       // Build files
       await build()
       // Copy files
