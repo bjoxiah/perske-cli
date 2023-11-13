@@ -34,7 +34,7 @@
     "@aws-sdk/client-route-53": "^3.445.0",
     "@aws-sdk/client-s3": "^3.449.0",
     "dotenv": "^16.3.1",
-    "gluegun": "latest",
+    "gluegun": "^5.1.6",
     "mime": "^3.0.0"
   },
   "devDependencies": {
