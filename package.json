@@ -1,11 +1,11 @@
 {
-  "name": "mango",
+  "name": "perske",
   "version": "0.0.1",
-  "description": "mango CLI",
+  "description": "perske CLI",
   "private": true,
   "types": "build/types/types.d.ts",
   "bin": {
-    "mango": "bin/mango"
+    "perske": "bin/perske"
   },
   "scripts": {
     "clean-build": "rimraf -rf ./build",

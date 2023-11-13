@@ -35,10 +35,10 @@ const client = new S3Client({
 })
 
 export const createS3Bucket = async (
-  s3BucketName: string
+  bucketName: string
 ): Promise<CreateBucketCommandOutput> => {
   try {
-    return await client.send(new CreateBucketCommand({ Bucket: s3BucketName }))
+    return await client.send(new CreateBucketCommand({ Bucket: bucketName }))
   } catch (error) {
     print.error(`Could not create S3 Bucket - ${JSON.stringify(error)}`)
     process.exit()
@@ -47,10 +47,10 @@ export const createS3Bucket = async (
 
 // A utility function to configure a bucket for static web hosting
 export const configureBucketForHosting = async (
-  s3BucketName: string
+  bucketName: string
 ): Promise<PutBucketWebsiteCommandOutput> => {
   const websiteConfig: PutBucketWebsiteCommandInput = {
-    Bucket: s3BucketName,
+    Bucket: bucketName,
     WebsiteConfiguration: {
       ErrorDocument: {
         Key: 'index.html', // Assuming you have an error.html file in your dist folder
@@ -80,7 +80,7 @@ export const configureBucketForHosting = async (
 // A utility function to upload files to a bucket
 const uploadFile = async (
   filePath: string,
-  s3BucketName: string,
+  bucketName: string,
   rootDir: string
 ): Promise<PutObjectCommandOutput> => {
   const fileContent = await filesystem.readAsync(filePath)
@@ -92,7 +92,7 @@ const uploadFile = async (
   print.info(contentType)
 
   const params: PutObjectCommandInput = {
-    Bucket: s3BucketName,
+    Bucket: bucketName,
     Key: key, // File name you want to save as in S3
     Body: fileContent,
     ContentType: contentType,
@@ -110,7 +110,7 @@ const uploadFile = async (
 // Recursively upload the 'build' directory files
 export const uploadDirectory = async (
   directoryPath: string,
-  s3BucketName: string,
+  bucketName: string,
   rootDir: string
 ): Promise<void> => {
   const dirContent = await filesystem.listAsync(directoryPath)
@@ -119,10 +119,10 @@ export const uploadDirectory = async (
     const fullPath = path.join(directoryPath, file)
     if (filesystem.isDirectory(fullPath)) {
       print.info(`Path to upload: ${fullPath}`)
-      await uploadDirectory(fullPath, s3BucketName, rootDir) // Recursive call for sub-directories
+      await uploadDirectory(fullPath, bucketName, rootDir) // Recursive call for sub-directories
     } else {
       print.info(`File to upload: ${fullPath}`)
-      const uploadData = await uploadFile(fullPath, s3BucketName, rootDir) // Upload each file
+      const uploadData = await uploadFile(fullPath, bucketName, rootDir) // Upload each file
       print.highlight(`Upload response: ${JSON.stringify(uploadData)}`)
     }
   }
@@ -145,13 +145,13 @@ export const listObjectsInBucket = async (
 
 // Delete objects in the bucket
 export const deleteObjectsInBucket = async (
-  s3BucketName: string,
+  bucketName: string,
   objectsToDelete: _Object[]
 ): Promise<DeleteObjectsCommandOutput> => {
   try {
     return await client.send(
       new DeleteObjectsCommand({
-        Bucket: s3BucketName,
+        Bucket: bucketName,
         Delete: {
           Objects: objectsToDelete.map((obj) => ({ Key: obj.Key })),
         },

@@ -6,9 +6,9 @@ import { build } from 'gluegun'
 async function run(argv) {
   // create a CLI runtime
   const cli = build()
-    .brand('mango')
+    .brand('perske')
     .src(__dirname)
-    .plugins('./node_modules', { matching: 'mango-*', hidden: true })
+    .plugins('./node_modules', { matching: 'perske-*', hidden: true })
     .help() // provides default for help, h, --help, -h
     .version() // provides default for version, v, --version, -v
     .create()

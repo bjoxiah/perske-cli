@@ -3,8 +3,8 @@ import { fileExist, getConfigJSON, upsertGitIgnore } from '../helper'
 import { bucketExists } from '../helper/s3'
 
 const DIRNAME = filesystem.cwd()
-const CONFIG_FILE_PATH = `${DIRNAME}/.mango/config.json`
-const MANGO_FILE_PATH = `${DIRNAME}/.mango`
+const CONFIG_FILE_PATH = `${DIRNAME}/.perske/config.json`
+const PERSKE_FILE_PATH = `${DIRNAME}/.perske`
 
 module.exports = async (toolbox: GluegunToolbox) => {
   toolbox.start = async () => {
@@ -36,17 +36,17 @@ module.exports = async (toolbox: GluegunToolbox) => {
       ])
 
       if (action.restart) {
-        await filesystem.removeAsync(MANGO_FILE_PATH)
+        await filesystem.removeAsync(PERSKE_FILE_PATH)
         print.info('Re-running the command with new configuration...')
         await toolbox.start() // Recursive call
       } else {
-        await filesystem.removeAsync(`${MANGO_FILE_PATH}/${json.buildFolder}`)
+        await filesystem.removeAsync(`${PERSKE_FILE_PATH}/${json.buildFolder}`)
         // start building the app
         await build()
         // copy build file
         await copy(`${DIRNAME}`, json)
         // update s3 bucket
-        await update(json, `${MANGO_FILE_PATH}/${json.buildFolder}`)
+        await update(json, `${PERSKE_FILE_PATH}/${json.buildFolder}`)
         print.success('Deployment successful!')
         process.exit()
       }
@@ -55,7 +55,7 @@ module.exports = async (toolbox: GluegunToolbox) => {
       const result = await ask([
         {
           type: 'input',
-          name: 's3BucketName',
+          name: 'bucketName',
           message: 'Unique AWS S3 Bucket Name:',
         },
         {
@@ -95,26 +95,24 @@ module.exports = async (toolbox: GluegunToolbox) => {
       }
 
       // Check if bucketName already exist
-      const bucketExist = await bucketExists(result.s3BucketName)
+      const bucketExist = await bucketExists(result.bucketName)
       if (bucketExist) {
         print.error(`Bucket name already exist in AWS S3`)
         process.exit()
       } else {
         print.highlight(`Bucket name does not already exist in AWS S3`)
-        // write config file in .mango directory
+        // write config file in .perske directory
         const data = JSON.stringify(result)
         await filesystem.writeAsync(CONFIG_FILE_PATH, data, {
           atomic: true,
           jsonIndent: 2,
         })
-        // print for test
-        print.info(data)
         // create deployment folder
-        await filesystem.dirAsync(`${MANGO_FILE_PATH}/${result.buildFolder}`)
+        await filesystem.dirAsync(`${PERSKE_FILE_PATH}/${result.buildFolder}`)
         // run the deployment flow
         await build()
         await copy(`${DIRNAME}`, result)
-        await upload(`${MANGO_FILE_PATH}/${result.buildFolder}`, result)
+        await upload(`${PERSKE_FILE_PATH}/${result.buildFolder}`, result)
         await domain(result)
         print.success('Deployment was successful!')
         process.exit()

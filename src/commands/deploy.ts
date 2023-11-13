@@ -2,11 +2,11 @@ import { GluegunCommand } from 'gluegun'
 
 const command: GluegunCommand = {
   name: 'deploy',
+  alias: ['d'],
+  description: 'Deploy to S3 (handy for CICD pipeline flow)',
   run: async (toolbox) => {
-    const { print, msi } = toolbox
-
-    print.info('Welcome to your CLI')
-    await msi()
+    const { deploy } = toolbox
+    await deploy()
   },
 }
 

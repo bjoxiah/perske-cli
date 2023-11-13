@@ -14,18 +14,17 @@ import { createCloudFrontDistribution } from '../helper/cloudfront'
 import { ResourceRecord } from '@aws-sdk/client-acm'
 import { disableBlockPublicAccess, setBucketPolicy } from '../helper/s3'
 import 'dotenv/config'
+import { IConfig } from '../model'
 module.exports = async (toolbox: GluegunToolbox) => {
-  toolbox.domain = async (config: any) => {
+  toolbox.domain = async (config: IConfig) => {
     const { print } = toolbox
     // Disable block public access
-    await disableBlockPublicAccess(config.s3BucketName, false)
+    await disableBlockPublicAccess(config.bucketName, false)
     if (config.cloudFront) {
       // set up cloud front distribution
       // Set Bucket Policy
-      await setBucketPolicy(config.s3BucketName)
-      const distribution = await createCloudFrontDistribution(
-        config.s3BucketName
-      )
+      await setBucketPolicy(config.bucketName)
+      const distribution = await createCloudFrontDistribution(config.bucketName)
       print.success(`Cloud Front Distribution: ${distribution}`)
       return
     } else if (config.domainName) {
@@ -60,9 +59,9 @@ module.exports = async (toolbox: GluegunToolbox) => {
       )
       // set up cloud front distribution
       // Set Bucket Policy
-      await setBucketPolicy(config.s3BucketName)
+      await setBucketPolicy(config.bucketName)
       const distribution = await createCloudFrontDistribution(
-        config.s3BucketName,
+        config.bucketName,
         certificateArn,
         config.domainName
       )
@@ -88,9 +87,9 @@ module.exports = async (toolbox: GluegunToolbox) => {
       return
     } else {
       // Set Bucket Policy
-      await setBucketPolicy(config.s3BucketName)
+      await setBucketPolicy(config.bucketName)
       print.success(
-        `AWS S3 Url: ${config.s3BucketName}.s3-website.${process.env.REGION}.amazonaws.com`
+        `AWS S3 Url: ${config.bucketName}.s3-website.${process.env.REGION}.amazonaws.com`
       )
       return
     }
