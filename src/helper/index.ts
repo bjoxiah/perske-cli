@@ -21,11 +21,19 @@ export const upsertGitIgnore = async (): Promise<void> => {
       await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
       print.fancy('Added .perske to .gitignore!')
     }
+    const envExist = gitignoreFile.split('\n').includes('.env')
+    if (envExist) {
+      print.fancy('.env is already in git ignore!')
+    } else {
+      gitignoreFile += `\n# Env \n.env`
+      await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
+      print.fancy('Added .env to .gitignore!')
+    }
   } else {
     // create a .gitignore file in the root directory
-    gitignoreFile = `\n# Perske Cli\n.perske/`
+    gitignoreFile = `\n# Perske Cli\n.perske\n.env`
     await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
-    print.fancy('Created .gitignore file and added .perske!!')
+    print.fancy('Created .gitignore file and added .perske and .env!!')
   }
 }
 

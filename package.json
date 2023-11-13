@@ -6,6 +6,10 @@
   "bin": {
     "perske": "bin/perske"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bjoxiah/perske-cli.git"
+  },
   "scripts": {
     "clean-build": "rimraf -rf ./build",
     "compile": "tsc -p .",
