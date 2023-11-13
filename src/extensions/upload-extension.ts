@@ -2,8 +2,6 @@ import { GluegunToolbox } from 'gluegun'
 import {
   configureBucketForHosting,
   createS3Bucket,
-  disableBlockPublicAccess,
-  setBucketPolicy,
   uploadDirectory,
 } from '../helper/s3'
 
@@ -17,10 +15,6 @@ module.exports = async (toolbox: GluegunToolbox) => {
     // Configure for web hosting
     const webHosting = await configureBucketForHosting(config.s3BucketName)
     print.info(`Web Hosting Config Response: ${JSON.stringify(webHosting)}`)
-    // Disable block public access
-    await disableBlockPublicAccess(config.s3BucketName)
-    // Set Bucket Policy
-    await setBucketPolicy(config.s3BucketName)
     // upload files from build folder
     await uploadDirectory(
       `${mangoFolder}`,

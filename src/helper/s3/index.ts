@@ -23,6 +23,7 @@ import { filesystem, print } from 'gluegun'
 import * as path from 'path'
 import 'dotenv/config'
 import * as mime from 'mime'
+import { CloudFrontOriginAccessIdentity } from '@aws-sdk/client-cloudfront'
 
 // require('dotenv').config()
 const client = new S3Client({
@@ -40,7 +41,7 @@ export const createS3Bucket = async (
     return await client.send(new CreateBucketCommand({ Bucket: s3BucketName }))
   } catch (error) {
     print.error(`Could not create S3 Bucket - ${JSON.stringify(error)}`)
-    throw error
+    process.exit()
   }
 }
 
@@ -64,11 +65,15 @@ export const configureBucketForHosting = async (
     const response = await client.send(
       new PutBucketWebsiteCommand(websiteConfig)
     )
-    print.info(`Configure Bucket For Hosting Response ${response}`)
+    print.info(
+      `Configure Bucket For Hosting Response ${JSON.stringify(response)}`
+    )
     return response
   } catch (error) {
-    print.error(`Could not configure bucket for hosting ${error}`)
-    throw error
+    print.error(
+      `Could not configure bucket for hosting ${JSON.stringify(error)}`
+    )
+    return
   }
 }
 
@@ -97,8 +102,8 @@ const uploadFile = async (
     const putCommand = new PutObjectCommand(params)
     return await client.send(putCommand)
   } catch (error) {
-    print.error(`Could not upload the file ${error}`)
-    throw error
+    print.error(`Could not upload the file ${JSON.stringify(error)}`)
+    return
   }
 }
 
@@ -133,8 +138,8 @@ export const listObjectsInBucket = async (
     )
     return data
   } catch (error) {
-    print.error(error)
-    throw error
+    print.error(`Could not list objects in S3 Bucket ${JSON.stringify(error)}`)
+    return
   }
 }
 
@@ -153,8 +158,8 @@ export const deleteObjectsInBucket = async (
       })
     )
   } catch (error) {
-    print.error(`Could not delete object ${error}`)
-    throw error
+    print.error(`Could not delete object ${JSON.stringify(error)}`)
+    return
   }
 }
 
@@ -185,18 +190,16 @@ export const getBucketPolicy = async (bucketName: string): Promise<string> => {
 }
 
 export const setBucketPolicy = async (bucketName: string): Promise<void> => {
-  const policyString = await getBucketPolicy(bucketName)
-  const params = {
-    Bucket: bucketName,
-    Policy: policyString,
-  }
-
   try {
+    const policyString = await getBucketPolicy(bucketName)
+    const params = {
+      Bucket: bucketName,
+      Policy: policyString,
+    }
     const data = await client.send(new PutBucketPolicyCommand(params))
     print.info(`Bucket policy updated successfully: ${JSON.stringify(data)}`)
   } catch (err) {
     print.error(`Bucket Policy Update Error: ${JSON.stringify(err)}`)
-    throw err
   }
 }
 
@@ -208,28 +211,58 @@ export const getS3BucketPolicy = async (bucketName: string): Promise<void> => {
     print.info(`Current Bucket policy: ${JSON.stringify(data)}`)
   } catch (err) {
     print.error(`Get Current Bucket Policy Error: ${JSON.stringify(err)}`)
-    throw err
   }
 }
 
 export const disableBlockPublicAccess = async (
-  bucketName: string
+  bucketName: string,
+  status: boolean
 ): Promise<void> => {
-  const params: PutPublicAccessBlockCommandInput = {
-    Bucket: bucketName,
-    PublicAccessBlockConfiguration: {
-      BlockPublicAcls: false,
-      IgnorePublicAcls: false,
-      BlockPublicPolicy: false,
-      RestrictPublicBuckets: false,
-    },
-  }
-
   try {
+    const params: PutPublicAccessBlockCommandInput = {
+      Bucket: bucketName,
+      PublicAccessBlockConfiguration: {
+        BlockPublicAcls: status,
+        IgnorePublicAcls: status,
+        BlockPublicPolicy: status,
+        RestrictPublicBuckets: status,
+      },
+    }
     await client.send(new PutPublicAccessBlockCommand(params))
-    print.info(`Block public access disabled for ${bucketName}`)
+    print.info(
+      `Block public access ${status ? 'enabled' : 'disabled'} for ${bucketName}`
+    )
   } catch (err) {
-    print.error(`Error disabling block public access: ${err}`)
-    throw err
+    print.error(`Error disabling block public access: ${JSON.stringify(err)}`)
+  }
+}
+
+export const updateS3BucketPolicyForCloudFront = async (
+  bucketName: string,
+  oaiId: CloudFrontOriginAccessIdentity
+): Promise<void> => {
+  try {
+    const bucketPolicy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: {
+            CanonicalUser: oaiId.S3CanonicalUserId,
+          },
+          Action: 's3:GetObject',
+          Resource: `arn:aws:s3:::${bucketName}/*`,
+        },
+      ],
+    }
+    await client.send(
+      new PutBucketPolicyCommand({
+        Bucket: bucketName,
+        Policy: JSON.stringify(bucketPolicy),
+      })
+    )
+    print.info(`Cloud front Bucket policy updated for ${bucketName}`)
+  } catch (error) {
+    print.error(`Error updating bucket policy: ${JSON.stringify(error)}`)
   }
 }

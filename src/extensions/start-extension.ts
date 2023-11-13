@@ -82,6 +82,15 @@ module.exports = async (toolbox: GluegunToolbox) => {
         ])
         Object.assign(result, domainResult)
       } else {
+        const cloud = await ask([
+          {
+            type: 'confirm',
+            name: 'cloudFront',
+            message:
+              'Want a cloud front distribution or just S3 bucket hosting?',
+          },
+        ])
+        Object.assign(result, cloud)
         delete result['domainName']
       }
 
@@ -91,6 +100,7 @@ module.exports = async (toolbox: GluegunToolbox) => {
         print.error(`Bucket name already exist in AWS S3`)
         process.exit()
       } else {
+        print.highlight(`Bucket name does not already exist in AWS S3`)
         // write config file in .mango directory
         const data = JSON.stringify(result)
         await filesystem.writeAsync(CONFIG_FILE_PATH, data, {
