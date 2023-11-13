@@ -15,17 +15,17 @@ export const upsertGitIgnore = async (): Promise<void> => {
     gitignoreFile = await filesystem.readAsync(__gitIgnoreFilePath)
     const perskeExist = gitignoreFile.split('\n').includes('.perske')
     if (perskeExist) {
-      print.fancy('.perske is already in git ignored!')
+      print.fancy('.perske is already in git ignore!')
     } else {
-      gitignoreFile += `\n# Mango Cli\n.perske`
+      gitignoreFile += `\n# Perske Cli\n.perske`
       await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
       print.fancy('Added .perske to .gitignore!')
     }
   } else {
     // create a .gitignore file in the root directory
-    gitignoreFile = `\n# Mango Cli\n.perske/`
+    gitignoreFile = `\n# Perske Cli\n.perske/`
     await filesystem.writeAsync(__gitIgnoreFilePath, gitignoreFile)
-    print.fancy('Create .gitignore file and added .perske!!')
+    print.fancy('Created .gitignore file and added .perske!!')
   }
 }
 

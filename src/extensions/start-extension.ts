@@ -100,7 +100,6 @@ module.exports = async (toolbox: GluegunToolbox) => {
         print.error(`Bucket name already exist in AWS S3`)
         process.exit()
       } else {
-        print.highlight(`Bucket name does not already exist in AWS S3`)
         // write config file in .perske directory
         const data = JSON.stringify(result)
         await filesystem.writeAsync(CONFIG_FILE_PATH, data, {
