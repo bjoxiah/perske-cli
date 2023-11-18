@@ -50,10 +50,12 @@ perske start
 Ideal for CI/CD pipelines, this command deploys your application using pre-specified parameters, streamlining updates to your AWS S3 bucket.
 
 ```bash
-perske deploy --bucketName 'your-bucket-name' --buildFolder 'your-build-folder'
+perske deploy --bucketName 'your-bucket-name' --buildFolder 'your-build-folder' --cloudFrontId 'your-cloud-front-id'
 ```
 
-Replace `your-bucket-name` and `your-build-folder` with your specific details.
+Replace `your-bucket-name`, `your-build-folder` and `your-cloud-front-id` with your specific details.
+
+Note: The `cloudFrontId` flag can be left out if you don't have a cloud front distribution for your s3 bucket.
 
 ## Contributing
 
