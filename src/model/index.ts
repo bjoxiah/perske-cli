@@ -4,4 +4,5 @@ export interface IConfig {
   customDomain?: boolean
   domainName?: string
   cloudFront?: boolean
+  cloudFrontId?: string
 }

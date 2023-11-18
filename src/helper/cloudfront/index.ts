@@ -5,6 +5,8 @@ import {
   CreateCloudFrontOriginAccessIdentityCommandInput,
   CreateDistributionCommand,
   CreateDistributionCommandInput,
+  CreateInvalidationCommand,
+  Distribution,
 } from '@aws-sdk/client-cloudfront'
 import 'dotenv/config'
 import { print } from 'gluegun'
@@ -21,7 +23,7 @@ export const createCloudFrontDistribution = async (
   bucketName: string,
   certificateArn: string = null,
   domainName: string = null
-): Promise<string> => {
+): Promise<Distribution> => {
   try {
     const domain = `${bucketName}.s3-website.${process.env.REGION}.amazonaws.com`
     print.info(`possible domain ${domain}`)
@@ -79,7 +81,7 @@ export const createCloudFrontDistribution = async (
       new CreateDistributionCommand(params)
     )
     print.info(`CloudFront distribution created: ${Distribution.DomainName}`)
-    return Distribution.DomainName
+    return Distribution
   } catch (error) {
     print.error(
       `Error creating cloud front distribution ${JSON.stringify(error)}`
@@ -112,3 +114,25 @@ export const createOriginAccessIdentity =
       return
     }
   }
+
+export const invalidateCache = async (
+  distributionId: string
+): Promise<void> => {
+  try {
+    const params = {
+      DistributionId: distributionId,
+      InvalidationBatch: {
+        CallerReference: `${Date.now()}`,
+        Paths: {
+          Quantity: 1,
+          Items: ['/*'], // Invalidate all files
+        },
+      },
+    }
+
+    await cloudfront.send(new CreateInvalidationCommand(params))
+    print.info('Cache invalidation initiated.')
+  } catch (error) {
+    print.error(`Error creating cache invalidation: ${JSON.stringify(error)}`)
+  }
+}

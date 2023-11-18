@@ -96,6 +96,7 @@ const uploadFile = async (
     Key: key, // File name you want to save as in S3
     Body: fileContent,
     ContentType: contentType,
+    CacheControl: 'no-cache',
   }
 
   try {

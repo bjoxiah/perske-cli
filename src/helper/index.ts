@@ -53,6 +53,15 @@ export const getConfigJSON = async (): Promise<IConfig> => {
   return JSON.parse(config)
 }
 
+export const setConfigJSON = async (data: string): Promise<void> => {
+  const __dirname = filesystem.cwd()
+  const CONFIG_FILE_PATH = `${__dirname}/.perske/config.json`
+  await filesystem.writeAsync(CONFIG_FILE_PATH, data, {
+    atomic: true,
+    jsonIndent: 2,
+  })
+}
+
 export const getCopyCommand = async (
   homeDir: string,
   config: IConfig

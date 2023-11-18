@@ -15,6 +15,7 @@ import { ResourceRecord } from '@aws-sdk/client-acm'
 import { disableBlockPublicAccess, setBucketPolicy } from '../helper/s3'
 import 'dotenv/config'
 import { IConfig } from '../model'
+import { setConfigJSON } from '../helper'
 module.exports = async (toolbox: GluegunToolbox) => {
   toolbox.domain = async (config: IConfig) => {
     const { print } = toolbox
@@ -57,6 +58,7 @@ module.exports = async (toolbox: GluegunToolbox) => {
         hostedZone.HostedZone.Id,
         cnameRecord
       )
+
       // set up cloud front distribution
       // Set Bucket Policy
       await setBucketPolicy(config.bucketName)
@@ -65,11 +67,15 @@ module.exports = async (toolbox: GluegunToolbox) => {
         certificateArn,
         config.domainName
       )
+      config.cloudFrontId = distribution.Id
+      // update config
+      const data = JSON.stringify(config)
+      await setConfigJSON(data)
       // Set up A record for cloudfront domain
       await createAliasRecord(
         config.domainName,
         hostedZone.HostedZone.Id,
-        distribution
+        distribution.DomainName
       )
       //   spinner.stop()
       print.info(
@@ -82,7 +88,7 @@ module.exports = async (toolbox: GluegunToolbox) => {
       print.newline()
       print.info(`Wait a little while for DNS propagation`)
       print.newline()
-      print.success(`The cloudfront url is: ${distribution}`)
+      print.success(`The cloudfront url is: ${distribution.DomainName}`)
       print.newline()
       return
     } else {

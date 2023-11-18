@@ -1,6 +1,10 @@
 import { GluegunToolbox, filesystem } from 'gluegun'
-import { fileExist, getConfigJSON, upsertGitIgnore } from '../helper'
-import { bucketExists } from '../helper/s3'
+import {
+  fileExist,
+  getConfigJSON,
+  setConfigJSON,
+  upsertGitIgnore,
+} from '../helper'
 
 const DIRNAME = filesystem.cwd()
 const CONFIG_FILE_PATH = `${DIRNAME}/.perske/config.json`
@@ -94,28 +98,18 @@ module.exports = async (toolbox: GluegunToolbox) => {
         delete result['domainName']
       }
 
-      // Check if bucketName already exist
-      const bucketExist = await bucketExists(result.bucketName)
-      if (bucketExist) {
-        print.error(`Bucket name already exist in AWS S3`)
-        process.exit()
-      } else {
-        // write config file in .perske directory
-        const data = JSON.stringify(result)
-        await filesystem.writeAsync(CONFIG_FILE_PATH, data, {
-          atomic: true,
-          jsonIndent: 2,
-        })
-        // create deployment folder
-        await filesystem.dirAsync(`${PERSKE_FILE_PATH}/${result.buildFolder}`)
-        // run the deployment flow
-        await build()
-        await copy(`${DIRNAME}`, result)
-        await upload(`${PERSKE_FILE_PATH}/${result.buildFolder}`, result)
-        await domain(result)
-        print.success('Deployment was successful!')
-        process.exit()
-      }
+      // write config file in .perske directory
+      const data = JSON.stringify(result)
+      await setConfigJSON(data)
+      // create deployment folder
+      await filesystem.dirAsync(`${PERSKE_FILE_PATH}/${result.buildFolder}`)
+      // run the deployment flow
+      await build()
+      await copy(`${DIRNAME}`, result)
+      await upload(`${PERSKE_FILE_PATH}/${result.buildFolder}`, result)
+      await domain(result)
+      print.success('Deployment was successful!')
+      process.exit()
     }
   }
 }
