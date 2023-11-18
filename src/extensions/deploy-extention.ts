@@ -26,6 +26,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
       process.exit()
     }
 
+    // cloudFrontId is used to invalidate cache
+
     // List objects in bucket
     const bucketItems = await listObjectsInBucket(json.bucketName)
     if (bucketItems) {
