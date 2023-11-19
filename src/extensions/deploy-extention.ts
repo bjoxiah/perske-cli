@@ -31,6 +31,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
     // List objects in bucket
     const bucketItems = await listObjectsInBucket(json.bucketName)
     if (bucketItems) {
+      // clear previous build files
+      await filesystem.removeAsync(`${PERSKE_FILE_PATH}/${json.buildFolder}`)
       // update .gitignore file
       await upsertGitIgnore()
       // Build files
@@ -39,6 +41,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
       await copy(DIRNAME, json)
       // Deploy to S3
       await update(json, `${PERSKE_FILE_PATH}/${json.buildFolder}`)
+      // clear build files
+      await filesystem.removeAsync(`${PERSKE_FILE_PATH}/${json.buildFolder}`)
       // Message
       print.success('Deployment successful!')
       process.exit()

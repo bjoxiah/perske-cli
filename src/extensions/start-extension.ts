@@ -51,6 +51,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
         await copy(`${DIRNAME}`, json)
         // update s3 bucket
         await update(json, `${PERSKE_FILE_PATH}/${json.buildFolder}`)
+        // clear build files
+        await filesystem.removeAsync(`${PERSKE_FILE_PATH}/${json.buildFolder}`)
         print.success('Deployment successful!')
         process.exit()
       }
@@ -107,6 +109,8 @@ module.exports = async (toolbox: GluegunToolbox) => {
       await build()
       await copy(`${DIRNAME}`, result)
       await upload(`${PERSKE_FILE_PATH}/${result.buildFolder}`, result)
+      // clear build files
+      await filesystem.removeAsync(`${PERSKE_FILE_PATH}/${result.buildFolder}`)
       await domain(result)
       print.success('Deployment was successful!')
       process.exit()
