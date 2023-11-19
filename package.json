@@ -1,6 +1,6 @@
 {
   "name": "perske",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "perske CLI",
   "types": "build/types/types.d.ts",
   "bin": {
