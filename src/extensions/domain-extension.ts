@@ -22,11 +22,15 @@ module.exports = async (toolbox: GluegunToolbox) => {
     // Disable block public access
     await disableBlockPublicAccess(config.bucketName, false)
     if (config.cloudFront) {
-      // set up cloud front distribution
       // Set Bucket Policy
       await setBucketPolicy(config.bucketName)
+      // set up cloud front distribution
       const distribution = await createCloudFrontDistribution(config.bucketName)
-      print.success(`Cloud Front Distribution: ${distribution}`)
+      config.cloudFrontId = distribution.Id
+      // update config
+      const data = JSON.stringify(config)
+      await setConfigJSON(data)
+      print.success(`Cloud Front Distribution Url: ${distribution.DomainName}`)
       return
     } else if (config.domainName) {
       print.info(
